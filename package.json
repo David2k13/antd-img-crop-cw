@@ -11,13 +11,13 @@
     "crop",
     "cropper"
   ],
-  "version": "1.0.1",
+  "version": "1.0.3",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/David2k13/antd-img-crop.git"
   },
   "author": "cw2k13",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/David2k13/antd-img-crop/issues"
   },

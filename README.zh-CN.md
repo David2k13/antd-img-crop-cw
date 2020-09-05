@@ -1,11 +1,17 @@
-# antd-img-crop
+<!--
+ * @Description: 注释
+ * @Date: 2020-09-05 14:44:28
+ * @LastEditTime: 2020-09-05 22:15:31
+ * @LastEditors: chenwei
+-->
+# antd-img-crop-cw
 
 图片裁切工具，用于 Ant Design [Upload](https://ant.design/components/upload-cn/) 组件。
 
-[![npm](https://img.shields.io/npm/v/antd-img-crop.svg?style=flat-square)](https://www.npmjs.com/package/antd-img-crop)
-[![npm](https://img.shields.io/npm/dt/antd-img-crop?style=flat-square)](https://www.npmtrends.com/antd-img-crop)
-[![npm bundle size](https://img.shields.io/bundlephobia/minzip/antd-img-crop?style=flat-square)](https://bundlephobia.com/result?p=antd-img-crop)
-[![GitHub](https://img.shields.io/github/license/nanxiaobei/antd-img-crop?style=flat-square)](https://github.com/nanxiaobei/antd-img-crop/blob/master/LICENSE)
+[![npm](https://img.shields.io/npm/v/antd-img-crop-cw.svg?style=flat-square)](https://www.npmjs.com/package/antd-img-crop-cw)
+[![npm](https://img.shields.io/npm/dt/antd-img-crop-cw?style=flat-square)](https://www.npmtrends.com/antd-img-crop-cw)
+[![npm bundle size](https://img.shields.io/bundlephobia/minzip/antd-img-crop-cw?style=flat-square)](https://bundlephobia.com/result?p=antd-img-crop-cw)
+[![GitHub](https://img.shields.io/github/license/David2k13/antd-img-crop-cw?style=flat-square)](https://github.com/nanxiaobei/antd-img-crop-cw/blob/master/LICENSE)
 
 [English](./README.md) | 简体中文
 
@@ -16,13 +22,13 @@
 ## 安装
 
 ```sh
-yarn add antd-img-crop
+yarn add antd-img-crop-cw
 ```
 
 ## 使用
 
 ```jsx harmony
-import ImgCrop from 'antd-img-crop';
+import ImgCrop from 'antd-img-crop-cw';
 import { Upload } from 'antd';
 
 const Demo = () => (
@@ -50,7 +56,7 @@ const Demo = () => (
 
 ## 样式
 
-为防止覆盖自定义 `antd` 样式，`antd-img-crop` 中没有引入组件样式文件。
+为防止覆盖自定义 `antd` 样式，`antd-img-crop-cw` 中没有引入组件样式文件。
 
 因此如果你的项目配置了 `babel-plugin-import`，且未使用 `Modal` 或 `Slider`，则需自行引入样式：
 

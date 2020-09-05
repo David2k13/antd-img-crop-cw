@@ -1,11 +1,11 @@
-# antd-img-crop
+# antd-img-crop-cw
 
 An image cropper for Ant Design [Upload](https://ant.design/components/upload/).
 
-[![npm](https://img.shields.io/npm/v/antd-img-crop.svg?style=flat-square)](https://www.npmjs.com/package/antd-img-crop)
-[![npm](https://img.shields.io/npm/dt/antd-img-crop?style=flat-square)](https://www.npmtrends.com/antd-img-crop)
-[![npm bundle size](https://img.shields.io/bundlephobia/minzip/antd-img-crop?style=flat-square)](https://bundlephobia.com/result?p=antd-img-crop)
-[![GitHub](https://img.shields.io/github/license/nanxiaobei/antd-img-crop?style=flat-square)](https://github.com/nanxiaobei/antd-img-crop/blob/master/LICENSE)
+[![npm](https://img.shields.io/npm/v/antd-img-crop-cw.svg?style=flat-square)](https://www.npmjs.com/package/antd-img-crop-cw)
+[![npm](https://img.shields.io/npm/dt/antd-img-crop-cw?style=flat-square)](https://www.npmtrends.com/antd-img-crop-cw)
+[![npm bundle size](https://img.shields.io/bundlephobia/minzip/antd-img-crop-cw?style=flat-square)](https://bundlephobia.com/result?p=antd-img-crop-cw)
+[![GitHub](https://img.shields.io/github/license/David2k13/antd-img-crop-cw?style=flat-square)](https://github.com/nanxiaobei/antd-img-crop-cw/blob/master/LICENSE)
 
 English | [简体中文](./README.zh-CN.md)
 
@@ -16,13 +16,13 @@ English | [简体中文](./README.zh-CN.md)
 ## Install
 
 ```sh
-yarn add antd-img-crop
+yarn add antd-img-crop-cw
 ```
 
 ## Usage
 
 ```jsx harmony
-import ImgCrop from 'antd-img-crop';
+import ImgCrop from 'antd-img-crop-cw';
 import { Upload } from 'antd';
 
 const Demo = () => (
@@ -50,7 +50,7 @@ const Demo = () => (
 
 ## Styles
 
-To prevent overwriting the custom styles to `antd`, `antd-img-crop` does not import the style files of components.
+To prevent overwriting the custom styles to `antd`, `antd-img-crop-cw` does not import the style files of components.
 
 Therefore, if your project configured `babel-plugin-import`, and not use `Modal` or `Slider`, you need to import the styles yourself:
 
