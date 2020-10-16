@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, forwardRef } from 'react';
+import React, { useState, useCallback, useMemo, useRef, forwardRef } from 'react';
 import t from 'prop-types';
 import Cropper from 'react-easy-crop';
 import LocaleReceiver from 'antd/es/locale-provider/LocaleReceiver';
@@ -7,13 +7,10 @@ import Slider from 'antd/es/slider';
 import './index.less';
 
 const pkg = 'antd-img-crop';
-const noop = () => {};
+const noop = () => { };
 
 const MEDIA_CLASS = `${pkg}-media`;
-const MODAL_TITLE = 'Edit image';
 
-const MIN_ZOOM = 1;
-const MAX_ZOOM = 3;
 const ZOOM_STEP = 0.1;
 
 const MIN_ROTATE = 0;
@@ -26,15 +23,22 @@ const EasyCrop = forwardRef((props, ref) => {
     aspect,
     shape,
     grid,
+
     hasZoom,
     zoomVal,
     rotateVal,
     setZoomVal,
     setRotateVal,
+
+    minZoom,
+    maxZoom,
     onComplete,
+
+    cropperProps,
   } = props;
 
   const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [cropSize, setCropSize] = useState({ width: 0, height: 0 });
 
   const onCropComplete = useCallback(
     (croppedArea, croppedAreaPixels) => {
@@ -43,21 +47,40 @@ const EasyCrop = forwardRef((props, ref) => {
     [onComplete]
   );
 
+  const onMediaLoaded = useCallback(
+    (mediaSize) => {
+      const { width, height } = mediaSize;
+      const ratioWidth = height * aspect;
+
+      if (width > ratioWidth) {
+        setCropSize({ width: ratioWidth, height });
+      } else {
+        setCropSize({ width, height: width / aspect });
+      }
+    },
+    [aspect]
+  );
+
   return (
     <Cropper
+      {...cropperProps}
       ref={ref}
       image={src}
+      crop={crop}
+      cropSize={cropSize}
+      onCropChange={setCrop}
       aspect={aspect}
       cropShape={shape}
       showGrid={grid}
       zoomWithScroll={hasZoom}
-      crop={crop}
       zoom={zoomVal}
       rotation={rotateVal}
-      onCropChange={setCrop}
       onZoomChange={setZoomVal}
       onRotationChange={setRotateVal}
+      minZoom={minZoom}
+      maxZoom={maxZoom}
       onCropComplete={onCropComplete}
+      onMediaLoaded={onMediaLoaded}
       classes={{ containerClassName: `${pkg}-container`, mediaClassName: MEDIA_CLASS }}
     />
   );
@@ -68,12 +91,18 @@ EasyCrop.propTypes = {
   aspect: t.number,
   shape: t.string,
   grid: t.bool,
+
   hasZoom: t.bool,
   zoomVal: t.number,
   rotateVal: t.number,
   setZoomVal: t.func,
   setRotateVal: t.func,
+
+  minZoom: t.number,
+  maxZoom: t.number,
   onComplete: t.func,
+
+  cropperProps: t.object,
 };
 
 const ImgCrop = forwardRef((props, ref) => {
@@ -81,24 +110,27 @@ const ImgCrop = forwardRef((props, ref) => {
     aspect,
     shape,
     grid,
+    quality,
+
     zoom,
     rotate,
-    beforeCrop,
-    gifCrop,
+    minZoom,
+    maxZoom,
+
     modalTitle,
     modalWidth,
     modalOk,
     modalCancel,
+
+    beforeCrop,
+    gifCrop,
     children,
+
+    cropperProps,
   } = props;
 
   const hasZoom = zoom === true;
   const hasRotate = rotate === true;
-
-  const modalTextProps = { okText: modalOk, cancelText: modalCancel };
-  Object.keys(modalTextProps).forEach((key) => {
-    if (!modalTextProps[key]) delete modalTextProps[key];
-  });
 
   const [src, setSrc] = useState('');
   const [zoomVal, setZoomVal] = useState(1);
@@ -131,11 +163,11 @@ const ImgCrop = forwardRef((props, ref) => {
               reject();
               return;
             }
+
             fileRef.current = file;
             resolveRef.current = resolve;
             rejectRef.current = reject;
-
-            if ((type === 'image/gif') && !gifCrop) {//gif 跳过裁切
+            if ((type === 'image/gif') && !gifCrop) { //gif 跳过裁切
               beforeUploadChild(file)
               return;
             }
@@ -159,8 +191,8 @@ const ImgCrop = forwardRef((props, ref) => {
   /**
    * Controls
    */
-  const isMinZoom = zoomVal === MIN_ZOOM;
-  const isMaxZoom = zoomVal === MAX_ZOOM;
+  const isMinZoom = zoomVal - ZOOM_STEP < minZoom;
+  const isMaxZoom = zoomVal + ZOOM_STEP > maxZoom;
   const isMinRotate = rotateVal === MIN_ROTATE;
   const isMaxRotate = rotateVal === MAX_ROTATE;
 
@@ -183,20 +215,28 @@ const ImgCrop = forwardRef((props, ref) => {
   /**
    * Modal
    */
+  const modalProps = useMemo(() => {
+    const obj = { width: modalWidth, okText: modalOk, cancelText: modalCancel };
+    Object.keys(obj).forEach((key) => {
+      if (!obj[key]) delete obj[key];
+    });
+    return obj;
+  }, [modalCancel, modalOk, modalWidth]);
+
   const onClose = useCallback(() => {
     setSrc('');
     setZoomVal(1);
     setRotateVal(0);
   }, []);
   const beforeUploadChild = async (blob) => {//执行antd upload的 beforeUpload
-    let newFile = blob;
     const { type, name, uid } = fileRef.current;
-    if (!newFile.name) {//根据名称判断是blob还是file
-      newFile.lastModifiedDate = Date.now();
-      newFile.name = name;
-      newFile.uid = uid;
+    let newFile;
+    if (blob.name) {//根据名称判断是blob还是file
+      newFile = blob//file
+    } else {
+      newFile = new File([blob], name, { type, name });
+      newFile.uid = uid
     }
-
     if (typeof beforeUploadRef.current !== 'function') return resolveRef.current(newFile);
 
     const res = beforeUploadRef.current(newFile, [newFile]);
@@ -257,78 +297,84 @@ const ImgCrop = forwardRef((props, ref) => {
     canvas.toBlob(
       beforeUploadChild,
       type,
-      0.4
+      quality
     );
-  }, [hasRotate, onClose, rotateVal]);
+  }, [hasRotate, onClose, quality, rotateVal]);
+
+  const renderComponent = (titleOfModal) => (
+    <>
+      {renderUpload()}
+      {src && (
+        <Modal
+          visible={true}
+          wrapClassName={`${pkg}-modal`}
+          title={titleOfModal}
+          onOk={onOk}
+          onCancel={onClose}
+          maskClosable={false}
+          destroyOnClose
+          {...modalProps}
+        >
+          <EasyCrop
+            ref={ref}
+            src={src}
+            aspect={aspect}
+            shape={shape}
+            grid={grid}
+            hasZoom={hasZoom}
+            zoomVal={zoomVal}
+            rotateVal={rotateVal}
+            setZoomVal={setZoomVal}
+            setRotateVal={setRotateVal}
+            minZoom={minZoom}
+            maxZoom={maxZoom}
+            onComplete={onComplete}
+            cropperProps={cropperProps}
+          />
+          {hasZoom && (
+            <div className={`${pkg}-control zoom`}>
+              <button onClick={subZoomVal} disabled={isMinZoom}>
+                －
+              </button>
+              <Slider
+                min={minZoom}
+                max={maxZoom}
+                step={ZOOM_STEP}
+                value={zoomVal}
+                onChange={setZoomVal}
+              />
+              <button onClick={addZoomVal} disabled={isMaxZoom}>
+                ＋
+              </button>
+            </div>
+          )}
+          {hasRotate && (
+            <div className={`${pkg}-control rotate`}>
+              <button onClick={subRotateVal} disabled={isMinRotate}>
+                ↺
+              </button>
+              <Slider
+                min={MIN_ROTATE}
+                max={MAX_ROTATE}
+                step={ROTATE_STEP}
+                value={rotateVal}
+                onChange={setRotateVal}
+              />
+              <button onClick={addRotateVal} disabled={isMaxRotate}>
+                ↻
+              </button>
+            </div>
+          )}
+        </Modal>
+      )}
+    </>
+  );
+
+  if (modalTitle) return renderComponent(modalTitle);
 
   return (
     <LocaleReceiver>
-      {(locale, localeCode) => (
-        <>
-          {renderUpload()}
-          {src && (
-            <Modal
-              visible={true}
-              wrapClassName={`${pkg}-modal`}
-              title={localeCode === 'zh-cn' && modalTitle === MODAL_TITLE ? '编辑图片' : modalTitle}
-              width={modalWidth}
-              onOk={onOk}
-              onCancel={onClose}
-              maskClosable={false}
-              destroyOnClose
-              {...modalTextProps}
-            >
-              <EasyCrop
-                ref={ref}
-                src={src}
-                aspect={aspect}
-                shape={shape}
-                grid={grid}
-                hasZoom={hasZoom}
-                zoomVal={zoomVal}
-                rotateVal={rotateVal}
-                setZoomVal={setZoomVal}
-                setRotateVal={setRotateVal}
-                onComplete={onComplete}
-              />
-              {hasZoom && (
-                <div className={`${pkg}-control zoom`}>
-                  <button onClick={subZoomVal} disabled={isMinZoom}>
-                    －
-                  </button>
-                  <Slider
-                    min={MIN_ZOOM}
-                    max={MAX_ZOOM}
-                    step={ZOOM_STEP}
-                    value={zoomVal}
-                    onChange={setZoomVal}
-                  />
-                  <button onClick={addZoomVal} disabled={isMaxZoom}>
-                    ＋
-                  </button>
-                </div>
-              )}
-              {hasRotate && (
-                <div className={`${pkg}-control rotate`}>
-                  <button onClick={subRotateVal} disabled={isMinRotate}>
-                    ↺
-                  </button>
-                  <Slider
-                    min={MIN_ROTATE}
-                    max={MAX_ROTATE}
-                    step={ROTATE_STEP}
-                    value={rotateVal}
-                    onChange={setRotateVal}
-                  />
-                  <button onClick={addRotateVal} disabled={isMaxRotate}>
-                    ↻
-                  </button>
-                </div>
-              )}
-            </Modal>
-          )}
-        </>
-      )}
+      {(locale, localeCode) => renderComponent(localeCode === 'zh-cn' ? '编辑图片' : 'Edit image')}
     </LocaleReceiver>
   );
 });
@@ -336,15 +382,23 @@ const ImgCrop = forwardRef((props, ref) => {
 ImgCrop.propTypes = {
   aspect: t.number,
   shape: t.oneOf(['rect', 'round']),
-  zoom: t.bool,
   grid: t.bool,
+  quality: t.number,
+
+  zoom: t.bool,
   rotate: t.bool,
-  beforeCrop: t.func,
-  gifCrop: t.bool,
+  minZoom: t.number,
+  maxZoom: t.number,
+
   modalTitle: t.string,
   modalWidth: t.oneOfType([t.number, t.string]),
   modalOk: t.string,
   modalCancel: t.string,
+
+  beforeCrop: t.func,
+  gifCrop: t.bool,
+  cropperProps: t.object,
+
   children: t.node,
 };
 
@@ -352,11 +406,13 @@ ImgCrop.defaultProps = {
   aspect: 1,
   shape: 'rect',
   grid: false,
+  quality: 0.4,
+
   zoom: true,
   rotate: false,
   gifCrop: true,
-  modalTitle: MODAL_TITLE,
-  modalWidth: 520,
+  minZoom: 1,
+  maxZoom: 3,
 };
 
 export default ImgCrop;

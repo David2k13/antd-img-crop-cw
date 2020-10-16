@@ -1,7 +1,7 @@
 <!--
  * @Description: 注释
  * @Date: 2020-09-05 14:44:28
- * @LastEditTime: 2020-09-05 22:15:31
+ * @LastEditTime: 2020-10-16 17:20:24
  * @LastEditors: chenwei
 -->
 # antd-img-crop-cw
@@ -37,22 +37,25 @@ const Demo = () => (
   </ImgCrop>
 );
 ```
-
 ## Props
 
-| 属性        | 类型                 | 默认         | 说明                                           |
-| ----------- | -------------------- | ------------ | ---------------------------------------------- |
-| aspect      | `number`             | `1 / 1`      | 裁切区域宽高比，`width / height`               |
-| shape       | `string`             | `'rect'`     | 裁切区域形状，`'rect'` 或 `'round'`            |
-| grid        | `boolean`            | `false`      | 显示裁切区域网格（九宫格）                     |
-| zoom        | `boolean`            | `true`       | 启用图片缩放                                   |
-| rotate      | `boolean`            | `false`      | 启用图片旋转                                   |
-| beforeCrop  | `function`           | -            | 弹窗打开前调用，若返回 `false`，弹框将不会打开 |
-| gifCrop     | `boolean`            | `true`       | 裁切 `.gif`                                    |
-| modalTitle  | `string`             | `'编辑图片'` | 弹窗标题                                       |
-| modalWidth  | `number` \| `string` | `520`        | 弹窗宽度，像素值或百分比                       |
-| modalOk     | `string`             | `'确定'`     | 弹窗确定按钮文字                               |
-| modalCancel | `string`             | `'取消'`     | 弹窗取消按钮文字                               |
+| Prop         | Type                 | Default        | Description                                                           |
+| ------------ | -------------------- | -------------- | --------------------------------------------------------------------- |
+| aspect       | `number`             | `1 / 1`        | Aspect of crop area , `width / height`                                |
+| shape        | `string`             | `'rect'`       | Shape of crop area, `'rect'` or `'round'`                             |
+| grid         | `boolean`            | `false`        | Show grid of crop area (third-lines)                                  |
+| quality      | `number`             | `0.4`          | Image quality, `0 ~ 1`                                                |
+| zoom         | `boolean`            | `true`         | Enable zoom for image                                                 |
+| rotate       | `boolean`            | `false`        | Enable rotate for image                                               |
+| minZoom      | `number`             | `1`            | Minimum zoom factor                                                   |
+| maxZoom      | `number`             | `3`            | Maximum zoom factor                                                   |
+| modalTitle   | `string`             | `'Edit image'` | Title of modal                                                        |
+| modalWidth   | `number` \| `string` | `520`          | Width of modal in pixels number or percentages                        |
+| modalOk      | `string`             | `'OK'`         | Text of confirm button of modal                                       |
+| modalCancel  | `string`             | `'Cancel'`     | Text of cancel button of modal                                        |
+| beforeCrop   | `function`           | -              | Call before modal open, if return `false`, it'll not open             |
+| gifCrop     | `boolean`            | `true`       | 裁切 `.gif`                                                              |
+| cropperProps | `object`             | -              | Props of [react-easy-crop] (\* [existing props] cannot be overridden) |
 
 ## 样式
 
