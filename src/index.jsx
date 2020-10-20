@@ -228,15 +228,8 @@ const ImgCrop = forwardRef((props, ref) => {
     setZoomVal(1);
     setRotateVal(0);
   }, []);
-  const beforeUploadChild = async (blob) => {//执行antd upload的 beforeUpload
-    const { type, name, uid } = fileRef.current;
-    let newFile;
-    if (blob.name) {//根据名称判断是blob还是file
-      newFile = blob//file
-    } else {
-      newFile = new File([blob], name, { type, name });
-      newFile.uid = uid
-    }
+  const beforeUploadChild = async (newFile) => {//执行antd upload的 beforeUpload
+
     if (typeof beforeUploadRef.current !== 'function') return resolveRef.current(newFile);
 
     const res = beforeUploadRef.current(newFile, [newFile]);
@@ -295,7 +288,11 @@ const ImgCrop = forwardRef((props, ref) => {
     // get the new image
     const { type, name, uid } = fileRef.current;
     canvas.toBlob(
-      beforeUploadChild,
+      async (blob) => {
+        let newFile = new File([blob], name, { type, name });
+        newFile.uid = uid
+        beforeUploadChild(newFile)
+      },
       type,
       quality
     );
